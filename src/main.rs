@@ -1,32 +1,36 @@
-use iced::{Settings, run};
+use config::{APP_SETTINGS, WINDOW_SETTINGS, WINDOW_TITLE};
 use iced::widget::{text, Column};
+mod config;
 
 #[derive(Default)]
 struct Terminal {}
 
 #[derive(Debug, Clone)]
 enum Message {
-    Button_Click,
+    ButtonClick,
 }
 
 impl Terminal {
-	fn update(&mut self, message: Message) {
-		// update app state
+    fn update(&mut self, message: Message) {
+        // update app state
         match message {
-            Message::Button_Click => {
+            Message::ButtonClick => {
                 println!("Button clicked");
             }
         }
-	}
+    }
 
-	fn view(&self) -> Column<Message> {
-		Column::new()
-			.push(text("This is where you will show the view of your app"))
-
-        .push(iced::widget::button(text("click")).on_press(Message::Button_Click))
-	}
+    fn view(&self) -> Column<Message> {
+        // app view
+        Column::new()
+            .push(text("This is where you will show the view of your app"))
+            .push(iced::widget::button(text("click")).on_press(Message::ButtonClick))
+    }
 }
 
 fn main() -> iced::Result {
-    iced::run("t", Terminal::update, Terminal::view)
+    iced::application(WINDOW_TITLE, Terminal::update, Terminal::view)
+        .settings(APP_SETTINGS)
+        .window(WINDOW_SETTINGS)
+        .run()
 }
