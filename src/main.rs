@@ -1,49 +1,32 @@
-use iced::{mouse::Button, widget::{button, pane_grid::Content, Column, Text}, Theme};
-use iced::widget::text;
-use iced::widget::column;
-use iced::run;
+use iced::{Settings, run};
+use iced::widget::{text, Column};
 
 #[derive(Default)]
-struct Counter {
-    value: i64,
-}
+struct Terminal {}
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone)]
 enum Message {
-    Increment,
-    Decrement,
+    Button_Click,
 }
 
-impl Counter {
-    fn update(&mut self, message: Message) {
+impl Terminal {
+	fn update(&mut self, message: Message) {
+		// update app state
         match message {
-            Message::Increment => {self.value += 1}
-            Message::Decrement => {self.value -= 1}
+            Message::Button_Click => {
+                println!("Button clicked");
+            }
         }
-    }
+	}
 
-    fn view(&self) -> Column<Message> {
-        column![
-            button("+").on_press(Message::Increment),
-            text(self.value),
-            button("-").on_press(Message::Decrement),
-        ]
-    }
+	fn view(&self) -> Column<Message> {
+		Column::new()
+			.push(text("This is where you will show the view of your app"))
+
+        .push(iced::widget::button(text("click")).on_press(Message::Button_Click))
+	}
 }
 
-pub fn main() -> iced::Result {
-    let mut counter = Counter::default();
-    let interface = counter.view();
-    iced::run("test", Counter::update, Counter::view)
-}
-
-#[test]
-fn it_counts_properly() {
-    let mut counter = Counter { value: 0 };
-
-    counter.update(Message::Increment);
-    counter.update(Message::Increment);
-    counter.update(Message::Decrement);
-
-    assert_eq!(counter.value, 1);
+fn main() -> iced::Result {
+    iced::run("t", Terminal::update, Terminal::view)
 }
