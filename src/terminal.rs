@@ -20,6 +20,7 @@ impl Terminal {
     pub fn view(&self) -> Element<'_, Message> {
         let input_row = text_input("a", &self.input_value)
             .on_input(|value| Message::TerminalMessage(TerminalMessage::InputChanged(value)))
+            .on_submit(Message::TerminalMessage(TerminalMessage::Submit))
             .width(Length::Fill)
             .line_height(2.0)
             .align_x(Alignment::Start);
