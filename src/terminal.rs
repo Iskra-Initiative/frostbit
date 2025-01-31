@@ -1,5 +1,4 @@
-use iced::widget::{button, text, text_input, Button, Column, Text, TextInput};
-// use iced::widget::{column, row, Button, Container, Rule, Text, TextInput, container};
+use iced::widget::{button, scrollable, text, text_input, Scrollable};
 use iced::widget::{column, container};
 use iced::{Alignment, Element, Length};
 
@@ -27,19 +26,28 @@ impl Terminal {
             .align_x(Alignment::Start);
 
         // display box
-        let display_row = container(
-            text(&self.display_value)
-                .size(20)
+        // let display_row = container(
+        //     text(&self.display_value)
+        //         .size(20)
+        //         .width(Length::Fill)
+        //         .height(Length::Fill)
+        //         .align_x(Alignment::Start),
+        // );
+
+        let n_display_row = Scrollable::new(
+            container(column![text(&self.display_value)])
                 .width(Length::Fill)
-                .height(Length::Fill)
-                .align_x(Alignment::Start),
-        );
+                .padding([0, 8]),
+        )
+        .direction(scrollable::Direction::Vertical(
+            scrollable::Scrollbar::default().width(5).scroller_width(5),
+        ));
 
         // submit button
         let input_row_w_button = button(container(text("btn")))
             .on_press(Message::TerminalMessage(TerminalMessage::Submit));
 
-        container(column![display_row, input_row, input_row_w_button]).into()
+        container(column![n_display_row, input_row, input_row_w_button]).into()
     }
 
     pub fn update(&mut self, message: TerminalMessage) {

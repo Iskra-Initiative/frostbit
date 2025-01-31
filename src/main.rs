@@ -6,10 +6,8 @@ mod controller;
 mod myserial;
 
 use config::{APP_SETTINGS, WINDOW_SETTINGS, WINDOW_TITLE};
-use controller::list_available_ports;
 use controller::TerminalController;
-use iced::widget::{column, row, Button, Container, Rule, Text, TextInput};
-use iced::widget::{scrollable, vertical_space};
+use iced::widget::{column, row, Button, Container, Rule, Text};
 use iced::{Alignment, Element, Length};
 
 use terminal::Terminal;
