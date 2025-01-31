@@ -18,7 +18,6 @@ pub struct Terminal {
 
 impl Terminal {
     pub fn view(&self) -> Element<'_, Message> {
-        // user input box
         let input_row = text_input("a", &self.input_value)
             .on_input(|value| Message::TerminalMessage(TerminalMessage::InputChanged(value)))
             .width(Length::Fill)
@@ -35,7 +34,6 @@ impl Terminal {
             scrollable::Scrollbar::default().width(5).scroller_width(5),
         ));
 
-        // submit button
         let input_row_w_button = button(container(text("btn")))
             .on_press(Message::TerminalMessage(TerminalMessage::Submit));
 
@@ -48,7 +46,8 @@ impl Terminal {
                 self.input_value = value;
             }
             TerminalMessage::Submit => {
-                self.display_value = self.input_value.clone();
+                self.display_value.push_str(&self.input_value);
+                self.display_value.push('\n');
                 self.input_value.clear();
             }
         }
