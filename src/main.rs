@@ -1,8 +1,9 @@
+// separate terminal panes component
+mod terminal;
+
 mod config;
 mod controller;
 mod myserial;
-
-use std::f32::consts::LN_10;
 
 use config::{APP_SETTINGS, WINDOW_SETTINGS, WINDOW_TITLE};
 use controller::list_available_ports;
@@ -11,20 +12,26 @@ use iced::widget::{column, row, Button, Container, Rule, Text, TextInput};
 use iced::widget::{scrollable, vertical_space};
 use iced::{Alignment, Element, Length};
 
+use terminal::Terminal;
+
 #[derive(Default)]
-struct Terminal {
-    input_value: String,
-    display_value: String,
+struct State {
+    new_disp_val: Vec<String>,
+    terminal: Terminal,
+}
+
+#[derive(Default)]
+struct App {
+    state: State,
 }
 
 #[derive(Debug, Clone)]
 enum Message {
     ButtonClick,
-    InputChanged(String),
-    Submit,
+    TerminalMessage(terminal::TerminalMessage),
 }
 
-impl Terminal {
+impl App {
     fn update(&mut self, message: Message) {
         match message {
             Message::ButtonClick => {
@@ -55,53 +62,19 @@ impl Terminal {
                 }
             }
 
-            Message::InputChanged(value) => {
-                self.input_value = value;
-            }
-            Message::Submit => {
-                self.display_value = self.input_value.clone();
-                self.input_value.clear();
+            Message::TerminalMessage(e) => {
+                self.state.terminal.update(e);
             }
         }
     }
+
     fn view(&self) -> Element<Message> {
         // left sidebar
         let left_sidebar = column![Button::new(Text::new("+")).on_press(Message::ButtonClick)]
             .padding(10)
             .spacing(10);
 
-        // data display
-        let display_row = Text::new(&self.display_value)
-            .size(20)
-            .width(Length::Fill)
-            .height(Length::Fill)
-            .align_x(iced::alignment::Horizontal::Left);
-
-        // user input box
-        let input_row = TextInput::new("->", &self.input_value)
-            .on_input(Message::InputChanged)
-            .on_submit(Message::Submit)
-            .width(Length::Fixed(400.0))
-            .line_height(2.0)
-            .padding(10);
-
-        let input_row_with_button = row![
-            input_row,
-            Button::new(Text::new("Send")).on_press(Message::Submit)
-        ]
-        .spacing(10);
-
-        // combine display and input box
-        let main_content = column![
-            Container::new(display_row)
-                .width(Length::Fill)
-                .height(Length::FillPortion(9)),
-            Container::new(input_row_with_button)
-                .width(Length::Fill)
-                .height(Length::Shrink)
-        ]
-        .spacing(10)
-        .padding(10);
+        let main_content = self.state.terminal.view();
 
         // combine left sidebar and main content
         let layout = row![
@@ -126,7 +99,7 @@ impl Terminal {
 }
 
 fn main() -> iced::Result {
-    iced::application(WINDOW_TITLE, Terminal::update, Terminal::view)
+    iced::application(WINDOW_TITLE, App::update, App::view)
         .settings(APP_SETTINGS)
         .window(WINDOW_SETTINGS)
         .run()
