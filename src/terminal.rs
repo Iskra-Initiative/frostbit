@@ -16,6 +16,7 @@ pub struct TerminalPane {
     pub input_value: String,
     pub display_value: String,
     line_num: u32,
+    char_num: u32
 }
 
 impl TerminalPane {
@@ -65,6 +66,7 @@ impl TerminalPane {
     pub fn update(&mut self, message: TerminalPaneMessage) {
         match message {
             TerminalPaneMessage::InputChanged(value) => {
+                // TODO: add input character limit
                 self.input_value = value;
             }
             TerminalPaneMessage::InputSubmit => {
