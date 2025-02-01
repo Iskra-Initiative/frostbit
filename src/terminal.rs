@@ -14,11 +14,29 @@ pub enum TerminalMessage {
 pub struct Terminal {
     pub input_value: String,
     pub display_value: String,
+    line_num: u32,
 }
 
 impl Terminal {
+    /// push data to display_value
+    /// if line_num is less than 10, add data to display_value
+    /// if line_num is greater than 10, remove all characters up to the first newline
+    fn reg_data(&mut self, new_data: &String) {
+        if self.line_num < 5 {
+            self.display_value.push_str(new_data);
+            self.display_value.push('\n');
+            self.line_num += 1;
+        } else {
+            let mut first_newline = self.display_value.chars().position(|c| c == '\n').unwrap();
+            first_newline += 1;
+            self.display_value = self.display_value[first_newline..].to_string();
+            self.display_value.push_str(new_data);
+            self.display_value.push('\n');
+        }
+    }
+
     pub fn view(&self) -> Element<'_, Message> {
-        let input_row = text_input("a", &self.input_value)
+        let input_row = text_input(">", &self.input_value)
             .on_input(|value| Message::TerminalMessage(TerminalMessage::InputChanged(value)))
             .on_submit(Message::TerminalMessage(TerminalMessage::Submit))
             .width(Length::Fill)
@@ -47,8 +65,7 @@ impl Terminal {
                 self.input_value = value;
             }
             TerminalMessage::Submit => {
-                self.display_value.push_str(&self.input_value);
-                self.display_value.push('\n');
+                self.reg_data(&(self.input_value.clone()));
                 self.input_value.clear();
             }
         }
