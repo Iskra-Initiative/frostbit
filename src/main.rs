@@ -1,21 +1,18 @@
-// separate terminal panes component
-mod terminal;
-
 mod config;
 mod controller;
 mod myserial;
+mod terminal;
 
 use config::{APP_SETTINGS, WINDOW_SETTINGS, WINDOW_TITLE};
 use controller::TerminalController;
 use iced::widget::{column, row, Button, Container, Rule, Text};
 use iced::{Alignment, Element, Length};
 
-use terminal::Terminal;
+use terminal::TerminalPane;
 
 #[derive(Default)]
 struct State {
-    new_disp_val: Vec<String>,
-    terminal: Terminal,
+    terminal: TerminalPane,
 }
 
 #[derive(Default)]
@@ -25,14 +22,14 @@ struct App {
 
 #[derive(Debug, Clone)]
 enum Message {
-    ButtonClick,
-    TerminalMessage(terminal::TerminalMessage),
+    SpawnTerminalSession,
+    TerminalPaneMessage(terminal::TerminalPaneMessage),
 }
 
 impl App {
     fn update(&mut self, message: Message) {
         match message {
-            Message::ButtonClick => {
+            Message::SpawnTerminalSession => {
                 let mut term_runner = TerminalController::new(1);
 
                 let sinfo = myserial::SerialPortInfo::new(
@@ -60,21 +57,24 @@ impl App {
                 }
             }
 
-            Message::TerminalMessage(e) => {
+            // pass TerminalMessage to terminal component for handling
+            Message::TerminalPaneMessage(e) => {
                 self.state.terminal.update(e);
             }
         }
     }
 
     fn view(&self) -> Element<Message> {
-        // left sidebar
-        let left_sidebar = column![Button::new(Text::new("+")).on_press(Message::ButtonClick)]
-            .padding(10)
-            .spacing(10);
+        // render left sidebar
+        let left_sidebar =
+            column![Button::new(Text::new("+")).on_press(Message::SpawnTerminalSession)]
+                .padding(10)
+                .spacing(10);
 
+        // render terminal pane view
         let main_content = self.state.terminal.view();
 
-        // combine left sidebar and main content
+        // combine app layout elements
         let layout = row![
             Container::new(left_sidebar)
                 .width(Length::Shrink)
@@ -89,6 +89,7 @@ impl App {
         .spacing(10)
         .align_y(Alignment::Start);
 
+        // render app layout
         Container::new(layout)
             .width(Length::Fill)
             .height(Length::Fill)
