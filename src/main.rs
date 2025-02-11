@@ -6,9 +6,12 @@ mod terminal;
 
 use config::{APP_SETTINGS, WINDOW_SETTINGS, WINDOW_TITLE};
 use controller::TerminalController;
-use iced::border::width;
-use iced::widget::{column, row, Button, Container, Rule, Text};
+use iced::widget::{column, container, row, Button, Container, Rule, Text};
 use iced::{Alignment, Element, Length};
+
+use tracing::level_filters::LevelFilter;
+use tracing::{event, Level};
+use tracing_subscriber;
 
 use terminal::TerminalPane;
 
@@ -74,20 +77,15 @@ impl App {
     }
 
     fn view(&self) -> Element<Message> {
-        // render left sidebar
         let left_sidebar: Element<Message> = self.state.left_sidebar.view();
-
-        // render terminal pane view
         let main_content = self.state.terminal.view();
-
-        // combine app layout elements
         let layout = row![
-            Container::new(left_sidebar)
+            container(left_sidebar)
                 .width(Length::Shrink)
                 .height(Length::Fill)
                 .padding(10),
-            Rule::vertical(2), // border between left sidebar and main content
-            Container::new(main_content)
+            Rule::vertical(2),
+            container(main_content)
                 .width(Length::Fill)
                 .height(Length::Fill)
                 .padding(10)
@@ -95,7 +93,6 @@ impl App {
         .spacing(10)
         .align_y(Alignment::Start);
 
-        // render app layout
         Container::new(layout)
             .width(Length::Fill)
             .height(Length::Fill)
@@ -104,6 +101,13 @@ impl App {
 }
 
 fn main() -> iced::Result {
+    tracing_subscriber::fmt()
+        .with_env_filter(
+            tracing_subscriber::EnvFilter::from_default_env()
+                .add_directive("frostbit=debug".parse().unwrap()),
+        )
+        .init();
+
     iced::application(WINDOW_TITLE, App::update, App::view)
         .settings(APP_SETTINGS)
         .window(WINDOW_SETTINGS)

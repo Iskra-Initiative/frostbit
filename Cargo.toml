@@ -11,4 +11,8 @@ rand = "0.8"
 serde = "1.0.217"
 serde_json = "1.0.137"
 serialport = "4.7.0"
-tracing-subscriber = "0.3"
+tracing = "0.1.41"
+tracing-subscriber = {version="0.3", features=["env-filter"]}
+
+[env]
+RUST_LOG = "INFO"
