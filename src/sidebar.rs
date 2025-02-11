@@ -1,23 +1,39 @@
-struct Sidebar {
+use iced::widget::{button, column, container, text};
+use iced::Element;
+
+use crate::Message;
+
+pub struct Sidebar {
     width: u32,
     height: u32,
     items: Vec<String>,
 }
 
-enum SidebarMessage {
+#[derive(Debug, Clone)]
+pub enum SidebarMessage {
     ItemSelected(usize),
 }
 
-impl Sidebar {
-    fn new() -> Sidebar {
-        Sidebar {
-            width: 200,
-            height: 600,
+impl Default for Sidebar {
+    fn default() -> Self {
+        Self {
+            width: 100,
+            height: 100,
             items: vec!["Item 1".to_string(), "Item 2".to_string()],
         }
     }
+}
 
-    fn update(&mut self, message: SidebarMessage) {
+impl Sidebar {
+    pub fn new(width: u32, height: u32, items: Vec<String>) -> Sidebar {
+        Sidebar {
+            width,
+            height,
+            items,
+        }
+    }
+
+    pub fn update(&mut self, message: SidebarMessage) {
         match message {
             SidebarMessage::ItemSelected(index) => {
                 println!("Item selected: {}", self.items[index]);
@@ -25,25 +41,13 @@ impl Sidebar {
         }
     }
 
-    fn view(&self) -> Element<SidebarMessage> {
-        let items = self.items.iter().enumerate().fold(
-            Column::new().spacing(10),
-            |column, (index, item)| {
-                column.push(
-                    Button::new(
-                        Text::new(item)
-                            .horizontal_alignment(HorizontalAlignment::Center)
-                            .vertical_alignment(VerticalAlignment::Center),
-                    )
-                    .on_press(SidebarMessage::ItemSelected(index)),
-                )
-            },
-        );
+    pub fn view(&self) -> Element<'_, Message> {
+        let left_sidebar = column![
+            button("+c").on_press(Message::SidebarMessage(SidebarMessage::ItemSelected(0))),
+        ]
+        .padding(10)
+        .spacing(10);
 
-        Container::new(items)
-            .width(Length::Units(self.width))
-            .height(Length::Units(self.height))
-            .padding(10)
-            .into()
+        container(left_sidebar).into()
     }
 }

@@ -1,10 +1,12 @@
 mod config;
 mod controller;
 mod myserial;
+mod sidebar;
 mod terminal;
 
 use config::{APP_SETTINGS, WINDOW_SETTINGS, WINDOW_TITLE};
 use controller::TerminalController;
+use iced::border::width;
 use iced::widget::{column, row, Button, Container, Rule, Text};
 use iced::{Alignment, Element, Length};
 
@@ -13,6 +15,7 @@ use terminal::TerminalPane;
 #[derive(Default)]
 struct State {
     terminal: TerminalPane,
+    left_sidebar: sidebar::Sidebar,
 }
 
 #[derive(Default)]
@@ -24,6 +27,7 @@ struct App {
 enum Message {
     SpawnTerminalSession,
     TerminalPaneMessage(terminal::TerminalPaneMessage),
+    SidebarMessage(sidebar::SidebarMessage),
 }
 
 impl App {
@@ -61,15 +65,17 @@ impl App {
             Message::TerminalPaneMessage(e) => {
                 self.state.terminal.update(e);
             }
+
+            // pass SidebarMessage to sidebar component for handling
+            Message::SidebarMessage(e) => {
+                self.state.left_sidebar.update(e);
+            }
         }
     }
 
     fn view(&self) -> Element<Message> {
         // render left sidebar
-        let left_sidebar =
-            column![Button::new(Text::new("+")).on_press(Message::SpawnTerminalSession)]
-                .padding(10)
-                .spacing(10);
+        let left_sidebar: Element<Message> = self.state.left_sidebar.view();
 
         // render terminal pane view
         let main_content = self.state.terminal.view();

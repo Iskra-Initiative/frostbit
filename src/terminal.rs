@@ -16,12 +16,12 @@ pub struct TerminalPane {
     pub input_value: String,
     pub display_value: String,
     line_num: u32,
-    char_num: u32
+    char_num: u32,
 }
 
 impl TerminalPane {
     fn reg_data(&mut self, new_data: &String) {
-        if self.line_num < 5 {
+        if self.line_num < 30 {
             self.display_value.push_str(new_data);
             self.display_value.push('\n');
             self.line_num += 1;
