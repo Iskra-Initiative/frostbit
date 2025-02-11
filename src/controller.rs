@@ -127,9 +127,7 @@ impl TerminalRunner {
                 Ok(data) => {
                     let data = String::from_utf8_lossy(&read_buf[..data]);
                     println!("Received data: {}", data);
-
                     println!("Thread Id: {:?}: Data: {:?}", self.thread_id, data);
-                    // eprintln!("Failed to add data to stream: {:?}", e);
                 }
                 Err(e) => {
                     // no data

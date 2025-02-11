@@ -2,7 +2,7 @@ use iced::widget::{button, scrollable, text, text_input, Scrollable};
 use iced::widget::{column, container};
 use iced::{Alignment, Element, Length};
 
-use tracing::{event, instrument, Level};
+use tracing::{event, Level};
 
 use crate::Message;
 
@@ -75,7 +75,6 @@ impl TerminalPane {
         container(column![scroll, input_row, input_row_w_button]).into()
     }
 
-    // #[instrument]
     pub fn update(&mut self, message: TerminalPaneMessage) {
         match message {
             TerminalPaneMessage::InputChanged(value) => {
@@ -83,7 +82,7 @@ impl TerminalPane {
                 self.char_num = self.input_value.chars().count() as u32;
             }
             TerminalPaneMessage::InputSubmit => {
-                event!(Level::INFO, "submit_input: {}", self.input_value);
+                event!(Level::INFO, "w");
                 self.reg_data(&(self.input_value.clone()));
                 self.input_value.clear();
                 self.char_num = 0;
