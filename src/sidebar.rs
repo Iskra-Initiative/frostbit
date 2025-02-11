@@ -43,7 +43,7 @@ impl Sidebar {
 
     pub fn view(&self) -> Element<'_, Message> {
         let left_sidebar = column![
-            button("+c").on_press(Message::SidebarMessage(SidebarMessage::ItemSelected(0))),
+            button("+").on_press(Message::SidebarMessage(SidebarMessage::ItemSelected(0))),
         ]
         .padding(10)
         .spacing(10);

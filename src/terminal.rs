@@ -21,16 +21,26 @@ pub struct TerminalPane {
 
 impl TerminalPane {
     fn reg_data(&mut self, new_data: &String) {
-        if self.line_num < 30 {
-            self.display_value.push_str(new_data);
-            self.display_value.push('\n');
-            self.line_num += 1;
-        } else {
-            let mut first_newline = self.display_value.chars().position(|c| c == '\n').unwrap();
-            first_newline += 1;
-            self.display_value = self.display_value[first_newline..].to_string();
-            self.display_value.push_str(new_data);
-            self.display_value.push('\n');
+        // match character amount
+        match self.char_num {
+            0 => return,
+            _ => {}
+        }
+
+        // match line amount and limit it to 30
+        match self.line_num {
+            (0..=30) => {
+                self.display_value.push_str(new_data);
+                self.display_value.push('\n');
+                self.line_num += 1;
+            }
+            _ => {
+                let mut first_newline = self.display_value.chars().position(|c| c == '\n').unwrap();
+                first_newline += 1;
+                self.display_value = self.display_value[first_newline..].to_string();
+                self.display_value.push_str(new_data);
+                self.display_value.push('\n');
+            }
         }
     }
 
@@ -68,10 +78,12 @@ impl TerminalPane {
             TerminalPaneMessage::InputChanged(value) => {
                 // TODO: add input character limit
                 self.input_value = value;
+                self.char_num = self.input_value.chars().count() as u32;
             }
             TerminalPaneMessage::InputSubmit => {
                 self.reg_data(&(self.input_value.clone()));
                 self.input_value.clear();
+                self.char_num = 0;
             }
         }
     }
