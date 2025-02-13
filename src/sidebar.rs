@@ -1,4 +1,4 @@
-use iced::widget::{button, column, container, text};
+use iced::widget::{button, column, container};
 use iced::Element;
 
 use crate::Message;
@@ -25,14 +25,6 @@ impl Default for Sidebar {
 }
 
 impl Sidebar {
-    pub fn new(width: u32, height: u32, items: Vec<String>) -> Sidebar {
-        Sidebar {
-            width,
-            height,
-            items,
-        }
-    }
-
     pub fn update(&mut self, message: SidebarMessage) {
         match message {
             SidebarMessage::ItemSelected(index) => {

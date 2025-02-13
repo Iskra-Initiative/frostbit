@@ -1,6 +1,9 @@
+use iced::border;
 use iced::widget::{button, scrollable, text, text_input, Scrollable};
 use iced::widget::{column, container};
-use iced::{Alignment, Element, Length};
+use iced::{Alignment, Element, Length, Shadow};
+
+use crate::theme::theme;
 
 use tracing::{event, Level};
 
@@ -47,32 +50,45 @@ impl TerminalPane {
     }
 
     pub fn view(&self) -> Element<'_, Message> {
-        let input_row = text_input(">", &self.input_value)
-            .on_input(|value| {
-                Message::TerminalPaneMessage(TerminalPaneMessage::InputChanged(value))
-            })
-            .on_submit(Message::TerminalPaneMessage(
-                TerminalPaneMessage::InputSubmit,
-            ))
-            .width(Length::Fill)
-            .line_height(2.0)
-            .align_x(Alignment::Start);
-
-        let scroll: Scrollable<'_, Message, iced::Theme, iced::Renderer> = scrollable(
-            column![text(&self.display_value)]
+        let input_row = container(
+            text_input(">", &self.input_value)
+                .on_input(|value| {
+                    Message::TerminalPaneMessage(TerminalPaneMessage::InputChanged(value))
+                })
+                .on_submit(Message::TerminalPaneMessage(
+                    TerminalPaneMessage::InputSubmit,
+                ))
                 .width(Length::Fill)
+                .line_height(2.0)
                 .align_x(Alignment::Start),
         )
-        .height(Length::Fill)
-        .direction(scrollable::Direction::Vertical(
-            scrollable::Scrollbar::default().width(5).scroller_width(5),
-        ));
+        .height(Length::Shrink);
 
-        let input_row_w_button = button(container(text("btn"))).on_press(
-            Message::TerminalPaneMessage(TerminalPaneMessage::InputSubmit),
-        );
+        let scroll = container(
+            scrollable(
+                column![text(&self.display_value)]
+                    .width(Length::Fill)
+                    .align_x(Alignment::Start),
+            )
+            .height(Length::Fill)
+            .direction(scrollable::Direction::Vertical(
+                scrollable::Scrollbar::default().width(5).scroller_width(5),
+            )),
+        )
+        .padding(10)
+        .style(|_| container::Style {
+            text_color: None,
+            background: None,
+            border: border::rounded(2).width(1).color([0.7, 0.7, 0.7]),
+            shadow: Shadow {
+                color: iced::Color::parse("#f155").unwrap(),
+                offset: iced::Vector::new(0.0, 0.0),
+                blur_radius: 5.0,
+            },
+        });
 
-        container(column![scroll, input_row, input_row_w_button]).into()
+        // container(column![scroll, input_row]).into()
+        column![scroll, input_row].into()
     }
 
     pub fn update(&mut self, message: TerminalPaneMessage) {

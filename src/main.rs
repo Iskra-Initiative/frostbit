@@ -3,11 +3,12 @@ mod controller;
 mod myserial;
 mod sidebar;
 mod terminal;
+mod theme;
 
 use config::{APP_SETTINGS, WINDOW_SETTINGS, WINDOW_TITLE};
 use controller::TerminalController;
 use iced::widget::{column, container, row, Button, Container, Rule, Text};
-use iced::{Alignment, Element, Length};
+use iced::{Alignment, Element, Length, Theme};
 
 use tracing::level_filters::LevelFilter;
 use tracing::{event, Level};
@@ -64,12 +65,10 @@ impl App {
                 }
             }
 
-            // pass TerminalMessage to terminal component for handling
             Message::TerminalPaneMessage(e) => {
                 self.state.terminal.update(e);
             }
 
-            // pass SidebarMessage to sidebar component for handling
             Message::SidebarMessage(e) => {
                 self.state.left_sidebar.update(e);
             }
@@ -111,5 +110,6 @@ fn main() -> iced::Result {
     iced::application(WINDOW_TITLE, App::update, App::view)
         .settings(APP_SETTINGS)
         .window(WINDOW_SETTINGS)
+        .theme(|_| Theme::Dracula)
         .run()
 }
