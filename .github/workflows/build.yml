@@ -1,0 +1,41 @@
+name: Build
+
+on:
+  push:
+    branches:
+      - '**'
+  pull_request:
+    branches:
+      - '**'
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build_matrix:
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+    - uses: actions/checkout@v4
+    - name: install dependencies
+      run: |
+        sudo apt update
+        sudo apt install \
+          build-essential \
+          git \
+          pkg-config \
+          libdbus-1-dev \
+          libudev-dev \
+          libxkbcommon-dev \
+          libfontconfig1-dev \
+          libasound2-dev
+    - name: check
+      run: cargo check
+    - name: clippy
+      run: cargo clippy --workspace --all-targets -- -D warnings
+    - name: test
+      run: cargo test --workspace --all-targets
+    - name: build
+      run: cargo build --verbose
