@@ -5,7 +5,7 @@ mod sidebar;
 mod terminal;
 mod theme;
 
-use config::{APP_SETTINGS, WINDOW_SETTINGS, WINDOW_TITLE};
+use config::{APP_SETTINGS, WINDOW_TITLE, window_settings};
 use controller::TerminalController;
 use iced::widget::{column, container, row, Button, Container, Rule, Text};
 use iced::{Alignment, Element, Length, Theme};
@@ -109,7 +109,7 @@ fn main() -> iced::Result {
 
     iced::application(WINDOW_TITLE, App::update, App::view)
         .settings(APP_SETTINGS)
-        .window(WINDOW_SETTINGS)
+        .window(window_settings())
         .theme(|_| Theme::Dracula)
         .run()
 }
