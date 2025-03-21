@@ -3,18 +3,19 @@ mod controller;
 mod myserial;
 mod sidebar;
 mod terminal;
+mod theme;
 
 use tracing_subscriber;
 
 use config::{window_settings, APP_SETTINGS, WINDOW_TITLE};
 use iced::widget::{container, row, Container, Rule};
-use iced::{Alignment, Element, Length, Theme};
+use iced::{Alignment, Element, Length};
 
 #[derive(Default)]
 struct State {
     terminal: terminal::TerminalPane,
     left_sidebar: sidebar::Sidebar,
-    theme: Theme,
+    style: theme::theme::Style,
 }
 
 #[derive(Default)]
@@ -27,6 +28,7 @@ enum Message {
     SpawnTerminalSession,
     TerminalPaneMessage(terminal::TerminalPaneMessage),
     SidebarMessage(sidebar::SidebarMessage),
+    StyleMessage(theme::theme::StyleMessage),
 }
 
 impl App {
@@ -67,12 +69,18 @@ impl App {
             Message::SidebarMessage(e) => {
                 self.state.left_sidebar.update(e);
             }
+
+            Message::StyleMessage(e) => {
+                self.state.style.update(e);
+            }
         }
     }
 
     fn view(&self) -> Element<Message> {
         let left_sidebar: Element<Message> = self.state.left_sidebar.view();
         let main_content = self.state.terminal.view();
+
+        let style = self.state.style.view();
 
         let layout = row![
             container(left_sidebar)
@@ -83,7 +91,12 @@ impl App {
             container(main_content)
                 .width(Length::Fill)
                 .height(Length::Fill)
-                .padding(10)
+                .padding(10),
+            Rule::vertical(2),
+            container(style)
+                .width(Length::Shrink)
+                .height(Length::Fill)
+                .padding(10),
         ]
         .spacing(10)
         .align_y(Alignment::Start);
@@ -106,6 +119,6 @@ fn main() -> iced::Result {
     iced::application(WINDOW_TITLE, App::update, App::view)
         .settings(APP_SETTINGS)
         .window(window_settings())
-        .theme(|_| Theme::Oxocarbon)
+        .theme(|app| app.state.style.theme())
         .run()
 }
