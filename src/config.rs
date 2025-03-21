@@ -14,7 +14,7 @@ pub const WINDOW_ICON: Option<iced::window::Icon> = None;
 pub const WINDOW_EXIT_ON_CLOSE_REQUEST: bool = true;
 
 // pub const WINDOW_PLATFORM_SPECIFIC: iced::window::settings::PlatformSpecific =
-    // iced::window::settings::PlatformSpecific::default();
+// iced::window::settings::PlatformSpecific::default();
 
 pub const APP_SETTINGS: iced::Settings = iced::Settings {
     id: None,

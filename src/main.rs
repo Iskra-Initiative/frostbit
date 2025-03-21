@@ -3,23 +3,18 @@ mod controller;
 mod myserial;
 mod sidebar;
 mod terminal;
-mod theme;
 
-use config::{APP_SETTINGS, WINDOW_TITLE, window_settings};
-use controller::TerminalController;
-use iced::widget::{column, container, row, Button, Container, Rule, Text};
-use iced::{Alignment, Element, Length, Theme};
-
-use tracing::level_filters::LevelFilter;
-use tracing::{event, Level};
 use tracing_subscriber;
 
-use terminal::TerminalPane;
+use config::{window_settings, APP_SETTINGS, WINDOW_TITLE};
+use iced::widget::{container, row, Container, Rule};
+use iced::{Alignment, Element, Length, Theme};
 
 #[derive(Default)]
 struct State {
-    terminal: TerminalPane,
+    terminal: terminal::TerminalPane,
     left_sidebar: sidebar::Sidebar,
+    theme: Theme,
 }
 
 #[derive(Default)]
@@ -38,7 +33,7 @@ impl App {
     fn update(&mut self, message: Message) {
         match message {
             Message::SpawnTerminalSession => {
-                let mut term_runner = TerminalController::new(1);
+                let mut term_runner = controller::TerminalController::new(1);
 
                 let sinfo = myserial::SerialPortInfo::new(
                     "COM1".to_string(),
@@ -78,6 +73,7 @@ impl App {
     fn view(&self) -> Element<Message> {
         let left_sidebar: Element<Message> = self.state.left_sidebar.view();
         let main_content = self.state.terminal.view();
+
         let layout = row![
             container(left_sidebar)
                 .width(Length::Shrink)
@@ -110,6 +106,6 @@ fn main() -> iced::Result {
     iced::application(WINDOW_TITLE, App::update, App::view)
         .settings(APP_SETTINGS)
         .window(window_settings())
-        .theme(|_| Theme::Dracula)
+        .theme(|_| Theme::Oxocarbon)
         .run()
 }

@@ -3,7 +3,7 @@ use iced::widget::{button, scrollable, text, text_input, Scrollable};
 use iced::widget::{column, container};
 use iced::{Alignment, Element, Length, Shadow};
 
-use crate::theme::theme;
+// use crate::theme::theme;
 
 use tracing::{event, Level};
 
@@ -87,7 +87,6 @@ impl TerminalPane {
             },
         });
 
-        // container(column![scroll, input_row]).into()
         column![scroll, input_row].into()
     }
 
