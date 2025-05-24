@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 use serde_json;
 
-#[derive(Clone, Serialize, Deserialize, Debug, Copy)]
+#[derive(Clone, Serialize, Deserialize, Debug, Copy, PartialEq)]
 pub enum DataBits {
     Five = 5,
     Six = 6,
@@ -20,7 +20,7 @@ impl From<DataBits> for serialport::DataBits {
     }
 }
 
-#[derive(Clone, Serialize, Deserialize, Copy, Debug)]
+#[derive(Clone, Serialize, Deserialize, Copy, Debug, PartialEq)]
 pub enum Parity {
     None,
     Odd,
@@ -37,7 +37,7 @@ impl From<Parity> for serialport::Parity {
     }
 }
 
-#[derive(Clone, Serialize, Deserialize, Debug, Copy)]
+#[derive(Clone, Serialize, Deserialize, Debug, Copy, PartialEq)]
 pub enum StopBits {
     One,
     Two,
@@ -51,7 +51,7 @@ impl From<StopBits> for serialport::StopBits {
         }
     }
 }
-#[derive(Clone, Serialize, Deserialize, Debug, Copy)]
+#[derive(Clone, Serialize, Deserialize, Debug, Copy, PartialEq)]
 pub enum FlowControl {
     None,
     Software,
@@ -68,7 +68,7 @@ impl From<FlowControl> for serialport::FlowControl {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub struct SerialPortInfo {
     pub name: String,
     pub speed: u32,
@@ -131,5 +131,11 @@ impl Into<serialport::SerialPortBuilder> for SerialPortInfo {
             .parity(self.parity.into())
             .flow_control(self.flow_control.into())
             .data_bits(self.data_bits.into())
+    }
+}
+
+impl std::fmt::Display for SerialPortInfo {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{} ({})", self.name, self.speed)
     }
 }

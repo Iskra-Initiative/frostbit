@@ -1,17 +1,18 @@
-use iced::widget::{button, column, container};
+use iced::widget::{button, column, container, pick_list, text};
 use iced::Element;
 
-use crate::Message;
+use crate::{myserial::SerialPortInfo, Message};
 
 pub struct Sidebar {
     width: u32,
     height: u32,
-    items: Vec<String>,
 }
 
 #[derive(Debug, Clone)]
 pub enum SidebarMessage {
-    ItemSelected(usize),
+    ConnectPressed,
+    DisconnectPressed,
+    RefreshPressed,
 }
 
 impl Default for Sidebar {
@@ -19,7 +20,6 @@ impl Default for Sidebar {
         Self {
             width: 100,
             height: 100,
-            items: vec!["Item 1".to_string(), "Item 2".to_string()],
         }
     }
 }
@@ -27,15 +27,54 @@ impl Default for Sidebar {
 impl Sidebar {
     pub fn update(&mut self, message: SidebarMessage) {
         match message {
-            SidebarMessage::ItemSelected(index) => {
-                println!("Item selected: {}", self.items[index]);
+            SidebarMessage::ConnectPressed => {
+                println!("Connect button pressed");
+            }
+            SidebarMessage::DisconnectPressed => {
+                println!("Disconnect button pressed");
+            }
+            SidebarMessage::RefreshPressed => {
+                println!("Refresh button pressed");
             }
         }
     }
 
-    pub fn view(&self) -> Element<'_, Message> {
+    pub fn view<'a>(
+        &self,
+        available_ports: &'a [SerialPortInfo],
+        selected_port: &'a Option<SerialPortInfo>,
+        is_connected: bool,
+    ) -> Element<'a, Message> {
+        let port_dropdown = pick_list(available_ports, selected_port.as_ref(), |port| {
+            Message::PortSelected(port.clone())
+        })
+        .placeholder("Select COM port...");
+
+        let connect_button = if is_connected {
+            button("-").on_press(Message::SidebarMessage(SidebarMessage::DisconnectPressed))
+        } else {
+            button("+").on_press(Message::SidebarMessage(SidebarMessage::ConnectPressed))
+        };
+
+        let refresh_button =
+            button("Refresh").on_press(Message::SidebarMessage(SidebarMessage::RefreshPressed));
+
+        let status_text = if is_connected {
+            if let Some(port) = selected_port {
+                text(format!("Connected to {}", port.name))
+            } else {
+                text("Connected")
+            }
+        } else {
+            text("Disconnected")
+        };
+
         let left_sidebar = column![
-            button("+").on_press(Message::SidebarMessage(SidebarMessage::ItemSelected(0))),
+            text("COM Ports:"),
+            port_dropdown,
+            connect_button,
+            refresh_button,
+            status_text,
         ]
         .padding(10)
         .spacing(10);

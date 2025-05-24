@@ -49,6 +49,28 @@ impl TerminalPane {
         }
     }
 
+    pub fn add_message(&mut self, message: &str) {
+        // Add message to display without checking char_num
+        match self.line_num {
+            (0..=30) => {
+                self.display_value.push_str(message);
+                self.display_value.push('\n');
+                self.line_num += 1;
+            }
+            _ => {
+                if let Some(first_newline) = self.display_value.chars().position(|c| c == '\n') {
+                    self.display_value = self.display_value[first_newline + 1..].to_string();
+                    self.display_value.push_str(message);
+                    self.display_value.push('\n');
+                } else {
+                    // If no newline found, clear and add new message
+                    self.display_value = format!("{}\n", message);
+                    self.line_num = 1;
+                }
+            }
+        }
+    }
+
     pub fn view(&self) -> Element<'_, Message> {
         let input_row = container(
             text_input(">", &self.input_value)
